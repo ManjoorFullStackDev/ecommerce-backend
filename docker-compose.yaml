@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: ecommerce-app
+    ports:
+      - "5001:5001"
+    environment:
+      MONGO_URI: mongodb://admin:4765@mongo-db:27017/users?authSource=admin
+    depends_on:
+      - mongo-db
+    networks:
+      - ecommerce-network
+
+  mongo-db:
+    image: mongo:8.0.4
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: 011235
+    networks:
+      - ecommerce-network
+networks:
+  ecommerce-network:
