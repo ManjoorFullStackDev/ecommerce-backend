@@ -6,7 +6,7 @@ const skillsModel = require("../models/skills");
 require("dotenv").config();
 module.exports.dbConnect = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(process.env.MONGO_URI_Local, {
       useNewUrlParser: true,
       // useUnifiedTopology: true,
     });

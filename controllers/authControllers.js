@@ -55,9 +55,6 @@ class authControllers {
     try {
       const isUserExist = await users.findById(req.userId);
       if (!isUserExist) {
-        // let { birthDate, ...otherData } = req.body;
-        // birthDate = new Date(birthDate.split("-").reverse().join("-"));
-        // const newUser = await users.create({ birthDate, ...otherData });
         let { skills, ...rest } = req.body;
         skills = skills.map((items) => items.value);
         const newUser = await users.create({ skills, ...rest });
