@@ -5,12 +5,15 @@ const adminModel = require("../models/adminModel");
 const users = require("../models/users");
 const locationModel = require("../models/location");
 const skillsModel = require("../models/skills");
+const registeredUserModel = require("../models/RegisteredUser");
 class authControllers {
   admin_login = async (req, res) => {
     const { email, password } = req.body;
     console.log("body", req.body);
     try {
-      const adminData = await adminModel.findOne({ email }).select("+password");
+      const adminData = await registeredUserModel
+        .findOne({ email })
+        .select("+password");
       console.log("adminData", adminData);
       if (adminData) {
         const match = await bcrypt.compare(password, adminData.password);
@@ -21,11 +24,11 @@ class authControllers {
             role: adminData.role,
           });
           res.cookie("access_token", token, {
-            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            expires: new Date(Date.now() +   60 * 60 * 1000),
           });
           responseReturn(res, 200, { token, message: "Login success" });
         } else {
-          responseReturn(res, 404, { error: "Passwords Wrong" });
+          responseReturn(res, 401, { error: "Passwords Wrong" });
         }
       } else {
         responseReturn(res, 404, { error: "Email not found" });
@@ -35,6 +38,31 @@ class authControllers {
     }
   };
   //End admin_login method
+
+  registerUser = async (req, res) => {
+    try {
+      const { userName, email, password, role } = req.body;
+      console.log("body", req.body);
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const isValidEmail = emailRegex.test(email);
+      if (!isValidEmail) {
+        responseReturn(res, 404, { error: "Email is invalid" });
+      }
+      console.log("role role", role);
+      const saltedRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltedRounds);
+      console.log("hashedPassword", hashedPassword);
+      const newUser = await registeredUserModel.create({
+        userName,
+        email,
+        password: hashedPassword,
+        role: role,
+      });
+      responseReturn(res, 200, { newUser: newUser });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 
   getUser = async (req, res) => {
     const { id, role } = req;

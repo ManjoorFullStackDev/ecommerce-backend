@@ -14,6 +14,8 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api", require("./routes/authRoutes"));
 app.get("/", (req, res) => res.send("Welcome to Backend"));
 const port = process.env.PORT;
